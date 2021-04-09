@@ -6,5 +6,5 @@ import "./OwnableToken.sol";
 
 
 contract GenToken is OwnableToken {
-  constructor() OwnableToken("Gen Test", "TGEN") {}
+  constructor() OwnableToken("Gen Token", "GEN") {}
 }

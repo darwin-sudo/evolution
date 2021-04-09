@@ -71,10 +71,10 @@ contract MasterChef is Ownable, ERC721Holder {
     // The block number when Gen mining starts.
     uint256 public startBlock;
     
-    uint public topPrice = 10; // 10$
-    uint public bottomPrice = 100; //100$
+    uint public topPrice = 100; // 10$
+    uint public bottomPrice = 10; //100$
     uint public lastBlockUpdate = 0;
-    uint public emissionUpdateInterval = 3; // 3 hours
+    uint public emissionUpdateInterval = 3600; // 3 hours
 
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -301,14 +301,14 @@ contract MasterChef is Ownable, ERC721Holder {
             accGenPerPower = accGenPerPower.add(genReward.mul(1e12).div(pool.totalPower));
         }
         
-        if ((user.lastClaimedBlock < user.lastPoweredBlock) && (block.number > user.lastPoweredBlock)) {
+        if ((user.lastClaimedBlock < user.lastPoweredBlock) && (block.number > user.lastPoweredBlock) && (user.power > 0)) {
             uint powerBonus = 100;
             
             powerBonus += proxy.getNFTPowerBonus() * (user.lastPoweredBlock - user.lastClaimedBlock) / (block.number - user.lastClaimedBlock);
             powerBonus += proxy.bonus(msg.sender);
         
             uint truePower = user.amount.mul(powerBonus).div(100);
-            return truePower.mul(accGenPerPower).div(1e12).sub(user.rewardDebt);
+            return user.power.mul(accGenPerPower).div(1e12).sub(user.rewardDebt) * truePower / user.power;
         }
         
         return user.power.mul(accGenPerPower).div(1e12).sub(user.rewardDebt);
@@ -348,15 +348,19 @@ contract MasterChef is Ownable, ERC721Holder {
              uint genBalance = gen.balanceOf(busdGenLP);
              uint priceCents = bottomPrice * 100;
              if (genBalance > 0) {
+                massUpdatePools();
                 priceCents = busd.balanceOf(busdGenLP).mul(100).div(genBalance);    
              }
 
              if (priceCents < bottomPrice * 100) {
+                massUpdatePools();
                 genPerBlock = priceCents.mul(1e18).div(bottomPrice).div(100);
              } else
              if (priceCents > topPrice * 100) {
+                 massUpdatePools();
                 genPerBlock = priceCents.mul(1e18).div(topPrice).div(100);
              } else if (genPerBlock != 1e18) {
+                 massUpdatePools();
                  genPerBlock = 1e18;
              }
         }

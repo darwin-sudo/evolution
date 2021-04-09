@@ -24,8 +24,6 @@ contract Evolution is Ownable, ERC721Holder {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
     
-    
-    
     mapping (uint => uint) public winChances; // chance To Win evolution
     mapping (uint => uint) public prices; // minimum price for evolution
     mapping (uint => uint) public bonuses; // nftTypeId -> bonus
@@ -34,7 +32,7 @@ contract Evolution is Ownable, ERC721Holder {
     mapping (uint256 => mapping (address => uint)) public evolutions; // evoIndex -> user -> payment
     
     uint public higherBeing = 7;
-    uint public evoTime = 5 * 60 / 3;//24 * 3600 / 3;
+    uint public evoTime = 24 * 3600 / 3;
 
     uint public startBlock = 0;
     mapping (uint => uint) public blockHashForEvo; // evo -> blockHash
@@ -65,7 +63,7 @@ contract Evolution is Ownable, ERC721Holder {
         prices[5] = 15;
         prices[6] = 20;
         prices[7] = 30;
-        prices[8] = 40;
+        prices[8] = 50;
         
         winChances[0] = 0;
         winChances[1] = 50;
@@ -80,7 +78,7 @@ contract Evolution is Ownable, ERC721Holder {
     
     function start() public onlyOwner {
         require(startBlock == 0, "started already");   
-        startBlock = block.number;
+        startBlock = block.number - evoTime;
     }
     
     function evoIndex() public view returns (uint) {
@@ -184,15 +182,7 @@ contract Evolution is Ownable, ERC721Holder {
         return bonuses[nftTypId];
     }
     
-    function emergencyWithdraw() public onlyOwner {
-        uint amount = gen.balanceOf(address(this));
-        gen.safeTransfer(msg.sender, amount);
-    }
-    
-    function emergencyWithdrawAmount(uint amount) public onlyOwner {
-        gen.safeTransfer(msg.sender, amount);
-    }
-    
+
     function updateBonus(uint nftTypeId, uint _bonus) public onlyOwner {
         bonuses[nftTypeId] = _bonus;
     }

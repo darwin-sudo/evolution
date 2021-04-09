@@ -43,7 +43,7 @@ contract Lootbox is Ownable {
         nft = _nft;
         dead = 0x000000000000000000000000000000000000dEaD;
         
-        chances = [6700, 8700, 9500, 9900, 9990, 9999];
+        chances = [6600, 8100, 9000, 9600, 9900, 9990, 9999];
     }
 
     function buy(uint numPacks) public {
