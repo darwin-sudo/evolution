@@ -293,10 +293,11 @@ contract MasterChef is Ownable, ERC721Holder {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
         uint256 accGenPerPower = pool.accGenPerPower;
-        uint256 blockAmount = block.number.sub(pool.lastRewardBlock);
+        
         
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.number > pool.lastRewardBlock && lpSupply != 0 && pool.totalPower != 0) {
+            uint256 blockAmount = block.number.sub(pool.lastRewardBlock);
             uint256 genReward = blockAmount.mul(genPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
             accGenPerPower = accGenPerPower.add(genReward.mul(1e12).div(pool.totalPower));
         }
