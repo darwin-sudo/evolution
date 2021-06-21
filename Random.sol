@@ -22,7 +22,7 @@ library Random {
   
   function get(Seed storage seed) internal view returns (bytes32) {
     require(isInitialized(seed), "Seed is not initialized");
-    require(block.number > seed.blockNumber, "Wait one more block to open this Seed");
+    require(isReady(seed), "Wait one more block to open this Seed");
     return blockhash(seed.blockNumber);
   }
 
